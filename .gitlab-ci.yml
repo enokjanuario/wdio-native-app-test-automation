@@ -1,0 +1,133 @@
+stages:
+  - install
+  - lint
+  - smoke
+  - regression
+  - report
+
+variables:
+  ANDROID_DEVICE_NAME: "Pixel_7_API_34"
+  APPIUM_PORT: "4723"
+  NODE_ENV: "test"
+
+install:
+  stage: install
+  image: node:20
+  script:
+    - npm ci
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"
+
+lint:
+  stage: lint
+  image: node:20
+  needs:
+    - install
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull
+  script:
+    - npm ci
+    - npm run lint
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"
+
+smoke-android:
+  stage: smoke
+  image: thyrlian/android-sdk:latest
+  needs:
+    - lint
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm curl
+    - npm ci
+    - mkdir -p apps screenshots
+    - curl -L -o apps/android.wdio.native.app.v2.0.0.apk
+        "https://github.com/webdriverio/native-demo-app/releases/download/v2.0.0/android.wdio.native.app.v2.0.0.apk"
+    - sdkmanager "system-images;android-34;google_apis;x86_64"
+    - echo "no" | avdmanager create avd -n "$ANDROID_DEVICE_NAME" -k "system-images;android-34;google_apis;x86_64" --force
+    - emulator -avd "$ANDROID_DEVICE_NAME" -no-window -no-audio -no-boot-anim &
+    - adb wait-for-device
+    - npx appium --allow-insecure chromedriver_autodownload &
+    - sleep 10
+  script:
+    - npm run android:smoke
+  artifacts:
+    when: always
+    paths:
+      - allure-results/
+      - screenshots/
+    expire_in: 7 days
+  timeout: 10 minutes
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"
+
+regression-android:
+  stage: regression
+  image: thyrlian/android-sdk:latest
+  needs:
+    - smoke-android
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull
+  before_script:
+    - apt-get update && apt-get install -y nodejs npm curl
+    - npm ci
+    - mkdir -p apps screenshots
+    - curl -L -o apps/android.wdio.native.app.v2.0.0.apk
+        "https://github.com/webdriverio/native-demo-app/releases/download/v2.0.0/android.wdio.native.app.v2.0.0.apk"
+    - sdkmanager "system-images;android-34;google_apis;x86_64"
+    - echo "no" | avdmanager create avd -n "$ANDROID_DEVICE_NAME" -k "system-images;android-34;google_apis;x86_64" --force
+    - emulator -avd "$ANDROID_DEVICE_NAME" -no-window -no-audio -no-boot-anim &
+    - adb wait-for-device
+    - npx appium --allow-insecure chromedriver_autodownload &
+    - sleep 10
+  script:
+    - npm run android
+  artifacts:
+    when: always
+    paths:
+      - allure-results/
+      - screenshots/
+    expire_in: 30 days
+  timeout: 20 minutes
+  allow_failure: false
+
+generate-report:
+  stage: report
+  image: node:20
+  needs:
+    - regression-android
+  script:
+    - npm ci
+    - npx allure generate allure-results --clean -o public
+  artifacts:
+    paths:
+      - public/
+    expire_in: 30 days
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"

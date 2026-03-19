@@ -1,0 +1,13 @@
+{
+  "textInputs": [
+    { "input": "Hello WebDriverIO", "description": "simple text" },
+    { "input": "Automacao com acentuacao", "description": "text with special characters" },
+    { "input": "12345!@#$%", "description": "text with numbers and symbols" },
+    { "input": "", "description": "empty field" }
+  ],
+  "dropdownOptions": [
+    { "option": "webdriver.io is awesome", "description": "first option" },
+    { "option": "Appium is awesome", "description": "second option" },
+    { "option": "This app is awesome", "description": "third option" }
+  ]
+}

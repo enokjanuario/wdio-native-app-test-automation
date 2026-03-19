@@ -1,0 +1,11 @@
+{
+  "validSignUp": [
+    { "email": "newuser@webdriver.io", "password": "NewPass@123", "description": "valid default signup" }
+  ],
+  "invalidSignUp": [
+    { "email": "", "password": "Pass@123", "confirmPassword": "Pass@123", "expectedError": "email", "description": "empty email" },
+    { "email": "test@test.com", "password": "", "confirmPassword": "", "expectedError": "password", "description": "empty password" },
+    { "email": "test@test.com", "password": "Pass@123", "confirmPassword": "Different@456", "expectedError": "confirmPassword", "description": "passwords do not match" },
+    { "email": "test@test.com", "password": "abc", "confirmPassword": "abc", "expectedError": "password", "description": "password too short" }
+  ]
+}

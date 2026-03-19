@@ -1,0 +1,15 @@
+node_modules/
+dist/
+allure-results/
+allure-report/
+screenshots/*
+!screenshots/.gitkeep
+*.log
+.DS_Store
+.env
+apps/*.apk
+apps/*.app
+apps/*.ipa
+apps/*.zip
+logs/
+logo_carrefour.png

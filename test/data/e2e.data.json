@@ -1,0 +1,8 @@
+{
+  "fullJourney": {
+    "loginEmail": "qa.test@webdriver.io",
+    "loginPassword": "Test@1234",
+    "formInput": "E2E Test Input",
+    "description": "full app journey with valid credentials"
+  }
+}

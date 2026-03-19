@@ -1,0 +1,13 @@
+{
+  "validCredentials": [
+    { "email": "qa.test@webdriver.io", "password": "Test@1234", "description": "valid default credentials" },
+    { "email": "admin@webdriver.io", "password": "Admin@5678", "description": "admin credentials" }
+  ],
+  "invalidCredentials": [
+    { "email": "", "password": "Test@1234", "expectedError": "email", "description": "empty email" },
+    { "email": "qa.test@webdriver.io", "password": "", "expectedError": "password", "description": "empty password" },
+    { "email": "invalidemail", "password": "Test@1234", "expectedError": "email", "description": "invalid email format" },
+    { "email": "", "password": "", "expectedError": "both", "description": "both fields empty" },
+    { "email": "test@test.com", "password": "short", "expectedError": "password", "description": "password too short" }
+  ]
+}
